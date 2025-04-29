@@ -54,6 +54,32 @@ export default function NewsFeed() {
     fetchNews()
   }, [])
 
+  function truncateWords(text: string, limit: number) {
+    // Ensure input is a string and not empty
+    if (typeof text !== 'string' || text.length === 0) {
+      return text;
+    }
+  
+    // Split the text into words by one or more whitespace characters.
+    // Filter out any empty strings that might result from multiple spaces.
+    const words = text.split(/\s+/).filter(word => word.length > 0);
+  
+    // Check if the total number of words exceeds the limit
+    if (words.length <= limit) {
+      // If not, return the original text as is
+      return text;
+    }
+  
+    // If it exceeds, take the first 'limit' words
+    const truncatedWords = words.slice(0, limit);
+  
+    // Join the selected words back together with spaces
+    const truncatedText = truncatedWords.join(' ');
+  
+    // Add the ellipsis at the end
+    return truncatedText + '...';
+  }
+
   // Apply filters when search or sentiment filter changes
   useEffect(() => {
     let results = news
@@ -180,7 +206,7 @@ export default function NewsFeed() {
                   <div className="text-sm text-muted-foreground mt-1">
                     {item.source} • {formatDate(item.published_at)} • By {item.author}
                   </div>
-                  <p className="text-sm mt-2">{item.content}</p>
+                  <p className="text-sm mt-2">{truncateWords(item.content, 30)}</p>
                   {item.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {item.tags.map((tag, idx) => (
